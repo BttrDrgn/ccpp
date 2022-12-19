@@ -1,0 +1,6 @@
+[submodule "deps/clsocket"]
+	path = deps/clsocket
+	url = https://github.com/BttrDrgn/clsocket
+[submodule "deps/json"]
+	path = deps/json
+	url = https://github.com/nlohmann/json
