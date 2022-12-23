@@ -33,7 +33,7 @@ public:
 		retry = 0x03, //Tells the backend to keep trying the effect (up to 5 mins then refund)
 		paused = 0x06, //Pauses a timed effect
 		resume = 0x07, //Resumes a paused timed effect
-		finished = 0x07, //Resumes a paused timed effect
+		finished = 0x08, //Stops a timed effect
 
 		visible = 0x80, //The effect should be show in the menu
 		not_visible = 0x81, //The effect should be hidden in the menu
