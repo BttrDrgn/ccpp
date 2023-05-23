@@ -1,5 +1,5 @@
 workspace "ccpp"
-	startproject "ccpp"
+	startproject "ccpp-tester"
 	location "./build/"
 	targetdir "%{wks.location}/bin/%{cfg.buildcfg}-%{cfg.platform}/"
 	objdir "%{wks.location}/obj/%{prj.name}/%{cfg.buildcfg}-%{cfg.platform}/"
@@ -60,7 +60,7 @@ workspace "ccpp"
 		}
 
 		includedirs {
-			"./src/include",
+			"./include",
 
 			"./deps/clsocket/src/",
 			"./deps/json/single_include/nlohmann/",
@@ -69,6 +69,35 @@ workspace "ccpp"
 		files {
 			"./ccpp.cpp",
 			"./include/ccpp.hpp",
+		}
+
+	project "ccpp-tester"
+		language "c++"
+		cppdialect "c++20"
+		kind "consoleapp"
+		warnings "off"
+
+		dependson {
+			"ccpp",
+			"clsocket",
+		}
+
+		links {
+			"ccpp",
+			"clsocket",
+		}
+
+		includedirs {
+			"./src/",
+			"./include/",
+
+			"./deps/clsocket/src/",
+			"./deps/json/single_include/nlohmann/",
+		}
+
+		files {
+			"./src/**",
+			"./include/**",
 		}
 
 	group "Dependencies"
