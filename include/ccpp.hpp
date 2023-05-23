@@ -42,7 +42,9 @@ public:
 	};
 
 	//initialize the ccpplib before doing anything else! Use threaded if you do not have access to a main loop
-	void initialize(bool threaded = false);
+	bool initialize_ex(const char* ip, std::uint16_t port, bool threaded);
+	//initialize the ccpplib before doing anything else! Use threaded if you do not have access to a main loop
+	bool initialize(bool threaded = false);
 	//Non-Blocking update, used to roll out own implementation within main loop; do not call if initialize is called with true!
 	void update();
 	//Registers a callback to the desired CrowdControl effect code

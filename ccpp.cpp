@@ -6,12 +6,12 @@
 //The tcp socket
 static CActiveSocket sock{};
 
-void ccpp::initialize(bool threaded)
+bool ccpp::initialize_ex(const char* ip, std::uint16_t port, bool threaded)
 {
 	if (sock.Initialize())
 	{
 		print_info("Attempting to connect to CrowdControl...");
-		if (sock.Open("127.0.0.1", 43384))
+		if (sock.Open(ip, port))
 		{
 			this->ready = true;
 			print_info("Connected to CrowdControl!");
@@ -27,24 +27,52 @@ void ccpp::initialize(bool threaded)
 					print_error("Failed to set socket to NonBlocking!");
 				}
 			}
+
+			return true;
 		}
 		else
 		{
 			print_error("Unable to connect to CrowdControl! Is CrowdControl open and ready?");
+			shutdown = true;
+			return false;
 		}
 	}
+}
+
+bool ccpp::initialize(bool threaded)
+{
+	return ccpp::initialize_ex("127.0.0.1", 43384, threaded);
 }
 
 void ccpp::check_socket()
 {
 	//Recieved packet from tcp socket
-	//Size is fairly big due to undeterminable effect code length
-	if (sock.Receive(128))
+	std::vector<std::uint8_t> buffer{};
+	if (sock.Receive(1))
 	{
+		if (sock.GetData() == 0) return;
+		//Recieve the data in chunks of 1 byte
+		buffer.emplace_back((std::uint8_t)sock.GetData()[0]);
+		//Until null term
+		while (sock.Receive(1) && (std::uint8_t)sock.GetData()[0] != 0x00)
+		{
+			buffer.emplace_back((std::uint8_t)sock.GetData()[0]);
+		}
+		buffer.emplace_back((std::uint8_t)0x00);
+
+		//Create new C array with size of the dynamic array
+		std::uint8_t* data = (std::uint8_t*)std::malloc(buffer.size());
+		//Copy the data into the new C array
+		for (auto i = 0; i < buffer.size(); ++i)
+		{
+			data[i] = buffer[i];
+		}
+		buffer.clear();
+
 		//Convert the json packet to c++ json
 		try
 		{
-			auto json = nlohmann::json::parse(sock.GetData());
+			auto json = nlohmann::json::parse(data);
 
 			//Convert CrowdControl effect code in json to std::string
 			std::string code = json["code"].dump();
